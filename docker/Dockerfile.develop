@@ -1,10 +1,26 @@
+# Use the official Freqtrade image as the base image
 FROM freqtradeorg/freqtrade:develop
 
-# Install dependencies
-COPY requirements-dev.txt /freqtrade/
+# Install system dependencies required for TA-Lib
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    wget \
+    curl \
+    libtool \
+    libffi-dev \
+    libssl-dev \
+    python3-dev \
+    libta-lib0-dev && \
+    apt-get clean
 
-RUN pip install numpy --user --no-cache-dir \
-  && pip install -r requirements-dev.txt --user --no-cache-dir
+# Install Poetry for managing dependencies (optional if you're using Poetry)
+RUN pip install poetry
 
-# Empty the ENTRYPOINT to allow all commands
-ENTRYPOINT []
+# Install Python dependencies using Poetry (or pip if needed)
+RUN poetry install  # Or use pip install if you're using pip
+
+# Expose the port the app will run on
+EXPOSE 8080
+
+# Set the entry point (modify this to run your actual Freqtrade bot or app)
+CMD ["freqtrade", "trade", "--config", "user_data/config.json"]
