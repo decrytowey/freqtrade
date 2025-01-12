@@ -136,7 +136,7 @@
         "remove_pumps": false
     },
     "telegram": {
-        "enabled": false,
+        "enabled": true,
         "token": "7102107509:AAGEtDxVMofTovJCw20QEX9_Ub2wMZccoyI",
         "chat_id": "7102107509",
         "notification_settings": {
