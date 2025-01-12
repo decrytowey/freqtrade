@@ -4,7 +4,7 @@ FROM freqtradeorg/freqtrade:develop
 # Switch to root to install system dependencies
 USER root
 
-# Install system dependencies required for TA-Lib and other build tools
+# Install system dependencies required for building TA-Lib and other dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     wget \
@@ -13,10 +13,29 @@ RUN apt-get update && apt-get install -y \
     libffi-dev \
     libssl-dev \
     python3-dev \
-    libta-lib0-dev \
     gcc \
+    make \
+    libzmq3-dev \
+    libcurl4-openssl-dev \
+    libpq-dev \
+    libjpeg-dev \
+    libjpeg8-dev \
+    liblcms2-dev \
+    libblas-dev \
+    liblapack-dev \
+    libatlas-base-dev \
+    libboost-all-dev \
+    && apt-get clean
+
+# Install TA-Lib from source
+RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
+    tar -xvzf ta-lib-0.4.0-src.tar.gz && \
+    cd ta-lib && \
+    ./configure && \
     make && \
-    apt-get clean
+    make install && \
+    cd .. && \
+    rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
 
 # Install Poetry for dependency management (if you're using Poetry)
 RUN pip install poetry
