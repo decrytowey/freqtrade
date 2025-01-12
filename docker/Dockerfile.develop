@@ -1,38 +1,38 @@
-# Use a base image with Python
+# Use an official Python runtime as a parent image
 FROM python:3.11-slim
 
-# Set the working directory in the container
+# Set environment variables to prevent writing .pyc files and buffer output
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
+
+# Set the working directory inside the container
 WORKDIR /app
 
-# Install system dependencies and TA-Lib
-RUN apt-get update && \
-    apt-get install -y \
+# Install system dependencies for TA-Lib
+RUN apt-get update && apt-get install -y \
     build-essential \
-    wget \
-    tar \
-    && wget https://github.com/ta-lib/ta-lib/releases/download/0.4.0/ta-lib-0.4.0-src.tar.gz && \
-    tar -xvzf ta-lib-0.4.0-src.tar.gz && \
-    cd ta-lib && \
-    ./configure && \
-    make && \
-    make install && \
-    cd .. && \
-    rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
+    gcc \
+    g++ \
+    make \
+    libatlas-base-dev \
+    ta-lib
 
-# Install poetry (optional, based on your project setup)
-RUN pip install poetry
+# Install Poetry (or any other dependency manager you use)
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
-# Copy the project files into the container
-COPY . .
+# Add Poetry to PATH
+ENV PATH="/root/.local/bin:$PATH"
 
-# Install the project dependencies using poetry (or pip, depending on your setup)
-RUN poetry install --no-dev  # If using poetry
-# Alternatively, use pip if you are not using poetry
-# RUN pip install -r requirements.txt
+# Copy the current directory contents into the container at /app
+COPY . /app/
 
-# Expose the port the app runs on (if needed)
+# Install Python dependencies
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+
+# Expose the port your app will run on (if applicable)
 EXPOSE 8080
 
-# Define the command to run the application
-CMD ["python", "your_main_script.py"]  # Replace with your actual entry point script
+# Command to run your application (this should be modified based on your bot setup)
+CMD ["python", "your_script.py"]
 
