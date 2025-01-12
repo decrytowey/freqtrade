@@ -8,6 +8,14 @@ function echo_block() {
     echo "----------------------------"
 }
 
+# Deactivate virtual environment if active
+function deactivate_virtualenv() {
+    if [ -n "${VIRTUAL_ENV}" ]; then
+        echo "Deactivating existing virtual environment"
+        deactivate
+    fi
+}
+
 # Check if Python 3.10 or newer is installed
 function check_installed_python() {
     if [ -n "${VIRTUAL_ENV}" ]; then
@@ -85,6 +93,8 @@ function install_talib() {
 
 # Install the bot
 function install() {
+    deactivate_virtualenv
+
     check_installed_python
 
     # Create virtual environment and activate it
@@ -104,4 +114,5 @@ function install() {
 
 # Run the installation process
 install
+
 
