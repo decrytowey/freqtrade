@@ -1,8 +1,10 @@
-# Use the official Python image as the base image
+# Use the official freqtrade image as the base image
 FROM freqtradeorg/freqtrade:develop
 
-# Install system dependencies required for TA-Lib and other packages
+# Switch to root to install system dependencies
 USER root
+
+# Install system dependencies required for TA-Lib and other build tools
 RUN apt-get update && apt-get install -y \
     build-essential \
     wget \
@@ -11,7 +13,9 @@ RUN apt-get update && apt-get install -y \
     libffi-dev \
     libssl-dev \
     python3-dev \
-    libta-lib0-dev && \
+    libta-lib0-dev \
+    gcc \
+    make && \
     apt-get clean
 
 # Install Poetry for dependency management (if you're using Poetry)
@@ -24,11 +28,10 @@ WORKDIR /app
 COPY . .
 
 # Install Python dependencies using Poetry or pip
-RUN poetry install  # Or use pip install if you're using pip
+RUN poetry install  # Or use pip install -r requirements.txt if you're using pip
 
 # Expose the port the app will run on
 EXPOSE 8080
 
 # Set the entry point for the container (if different from the default)
 CMD ["freqtrade", "trade", "--config", "user_data/config.json"]
-
