@@ -91,8 +91,8 @@
     ],
     "exchange": {
         "name": "binance",
-        "key": "your_exchange_key",
-        "secret": "your_exchange_secret",
+        "key": "",
+        "secret": "",
         "password": "",
         "log_responses": false,
         // "unknown_fee_rate": 1,
