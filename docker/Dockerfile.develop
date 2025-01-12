@@ -1,4 +1,4 @@
-# Use an official Python image as the base image 
+# Use an official Python image as the base image
 FROM python:3.11-slim
 
 # Set the working directory
@@ -22,11 +22,12 @@ RUN pip install poetry
 # Copy your application files
 COPY . .
 
-# Install Python dependencies using Poetry or pip
-RUN poetry install  # Or use pip install if you're using pip
+# Install Python dependencies using Poetry
+RUN poetry install
 
 # Expose the port the app will run on
 EXPOSE 8080
 
 # Set the entry point
-CMD ["freqtrade", "trade", "--config", "user_data/config.json"]
+CMD ["python", "your_main_file.py"]
+
