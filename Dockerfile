@@ -1,4 +1,4 @@
-# Use an official Python slim image
+# Use a lightweight Python image
 FROM python:3.11-slim
 
 # Install system dependencies, including ta-lib
@@ -10,14 +10,14 @@ RUN apt-get update && apt-get install -y \
 # Set the working directory
 WORKDIR /app
 
-# Copy the project files
+# Copy project files
 COPY . .
 
 # Install Python dependencies
 RUN pip install --upgrade pip && pip install poetry
 RUN poetry install --no-dev
 
-# Expose the application port (optional, adjust as needed)
+# Expose application port (if applicable)
 EXPOSE 8080
 
 # Start the application
