@@ -1,6 +1,7 @@
+# Base image
 FROM python:3.12.7-slim-bookworm as base
 
-# Setup env
+# Setup environment
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -20,25 +21,27 @@ RUN mkdir /freqtrade \
 
 WORKDIR /freqtrade
 
-# Install dependencies
+# Install Python build dependencies
 FROM base as python-deps
-RUN  apt-get update \
+RUN apt-get update \
   && apt-get -y install build-essential libssl-dev git libffi-dev libgfortran5 pkg-config cmake gcc \
   && apt-get clean \
   && pip install --upgrade pip wheel
 
-# Install TA-lib
-COPY build_helpers/* /tmp/
-RUN cd /tmp && /tmp/install_ta-lib.sh && rm -r /tmp/*ta-lib*
-ENV LD_LIBRARY_PATH /usr/local/lib
+# Install TA-Lib dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libta-lib0-dev \
+    ta-lib \
+    && apt-get clean
 
-# Install dependencies
+# Install Python dependencies
 COPY --chown=ftuser:ftuser requirements.txt requirements-hyperopt.txt /freqtrade/
 USER ftuser
-RUN  pip install --user --no-cache-dir "numpy<2.0" \
+RUN pip install --user --no-cache-dir "numpy<2.0" \
   && pip install --user --no-cache-dir -r requirements-hyperopt.txt
 
-# Copy dependencies to runtime-image
+# Copy dependencies to runtime image
 FROM base as runtime-image
 COPY --from=python-deps /usr/local/lib /usr/local/lib
 ENV LD_LIBRARY_PATH /usr/local/lib
@@ -46,13 +49,16 @@ ENV LD_LIBRARY_PATH /usr/local/lib
 COPY --from=python-deps --chown=ftuser:ftuser /home/ftuser/.local /home/ftuser/.local
 
 USER ftuser
-# Install and execute
+
+# Copy application files
 COPY --chown=ftuser:ftuser . /freqtrade/
 
+# Install the application and UI
 RUN pip install -e . --user --no-cache-dir --no-build-isolation \
   && mkdir /freqtrade/user_data/ \
   && freqtrade install-ui
 
+# Set the entrypoint and default command
 ENTRYPOINT ["freqtrade"]
-# Default to trade mode
-CMD [ "trade" ]
+CMD ["trade"]
+
