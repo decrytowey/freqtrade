@@ -1,6 +1,7 @@
+# Use an official Python image
 FROM python:3.11-slim
 
-# Install system dependencies
+# Install system dependencies (including ta-lib)
 RUN apt-get update && apt-get install -y \
     libta-lib0-dev \
     ta-lib \
@@ -9,12 +10,12 @@ RUN apt-get update && apt-get install -y \
 # Install Poetry
 RUN pip install poetry
 
-# Copy project files
-COPY . /app
-WORKDIR /app
+# Copy the Freqtrade source code
+COPY . /freqtrade
+WORKDIR /freqtrade
 
-# Install Python dependencies
+# Install Python dependencies using Poetry
 RUN poetry install --no-root
 
-# Command to run your application
-CMD ["poetry", "run", "python", "your_app.py"]
+# Set the command to run Freqtrade
+CMD ["poetry", "run", "freqtrade", "trade", "--strategy", "YourStrategyName"]
