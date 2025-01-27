@@ -1,26 +1,20 @@
-# Use a lightweight Python image
 FROM python:3.11-slim
 
-# Install system dependencies, including ta-lib
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    libta-lib0-dev ta-lib build-essential gcc \
-    && apt-get clean \
+    libta-lib0-dev \
+    ta-lib \
     && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory
-WORKDIR /app
+# Install Poetry
+RUN pip install poetry
 
 # Copy project files
-COPY . .
+COPY . /app
+WORKDIR /app
 
 # Install Python dependencies
-RUN pip install --upgrade pip && pip install poetry
-RUN poetry install --no-dev
+RUN poetry install --no-root
 
-# Expose application port (if applicable)
-EXPOSE 8080
-
-# Start the application
-CMD ["python", "main.py"]
-
-
+# Command to run your application
+CMD ["poetry", "run", "python", "your_app.py"]
